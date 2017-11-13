@@ -1,6 +1,6 @@
 '''client.py: Handles the internal function of the client UI'''
 from socket import socket, AF_INET, SOCK_STREAM
-from Tkinter import END
+from Tkinter import END, DISABLED, NORMAL
 class Client(object):
     """Class for Client, handles internally the messages and UI function"""
 
@@ -21,4 +21,6 @@ class Client(object):
         while True:
             data = self.client_socket.recv(1024)
             if data:
+                self.area.configure(state=NORMAL)
                 self.area.insert(END, str(data))
+                self.area.configure(state=DISABLED)

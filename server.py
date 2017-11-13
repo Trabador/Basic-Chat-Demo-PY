@@ -31,24 +31,41 @@ class Server(object):
         for client in self.clients:
             client.send(data)
 
-    def create_threads(self, con, add):
+    def create_thread(self, con, add):
         '''Creates a thread in daemon mode to handle each connection from each client.
            Receives a connection and adress from client socket'''
         client_thread = Thread(target=self.process_messages, args=(con, add))
         client_thread.daemon = True
         client_thread.start()
 
-    def run_server(self):
-        '''Run the main thread in the class. This is the method in charge
-           of handling new connections from the clients, creating a thread for each connection
-           and adding the new connection to the connections list'''
+    def handle_connections(self):
+        '''This is the method in charge of handling new connections from the clients,
+           creating a thread for each connection and adding the new connection to the
+           connections list'''
         while True:
             connection, address = self.server_socket.accept()
-            self.create_threads(connection, address)
+            self.create_thread(connection, address)
             self.clients.append(connection)
             print "Clients connected"
             print "=========================================================================>"
             print self.clients
+
+    def create_handle_thread(self):
+        '''Creates the thread that handles connections from clients. Runs in daemon mode'''
+        handle_thread = Thread(target=self.handle_connections)
+        handle_thread.daemon =True
+        handle_thread.start()
+
+    def run_server(self):
+        '''Run the main thread in the class.Checks for user input to exit the server'''
+        #main thread
+        self.create_handle_thread()
+        while True:
+            print "Enter Exit to close the server"
+            entry = str(raw_input("")).lower()
+            if entry == 'exit':
+                print "Server Closed"
+                break
 
 #Instancing the class and running
 if __name__ == '__main__':

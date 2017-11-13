@@ -1,6 +1,6 @@
 '''clientwin.py: Run to create the client user interface'''
 from Tkinter import (Tk, StringVar, Entry, Button, Frame, Text, Scrollbar,
-                     BOTTOM, LEFT, RIGHT, TOP, RIDGE, Y)
+                     BOTTOM, LEFT, RIGHT, TOP, RIDGE, Y, DISABLED)
 from threading import Thread
 from client import Client
 
@@ -37,6 +37,7 @@ class ClientUI(object):
         self.messages_area = Text(frame, height=26, width=50)
         vertical_scroll = Scrollbar(frame, command=self.messages_area.yview)
         self.messages_area.configure(yscrollcommand=vertical_scroll.set)
+        self.messages_area.configure(state=DISABLED)
 
         self.messages_area.pack(side=LEFT)
         vertical_scroll.pack(side=RIGHT, fill=Y)
