@@ -1,68 +1,55 @@
-from socket import *
-from threading import *
-import sys
-class Server():
-    """docstring here"""
+from socket import socket, AF_INET, SOCK_STREAM
+from threading import Thread
+class Server(object):
+    """Class for the server"""
 
     def __init__(self):
-        '''docstring'''
-        self.clients =  []
-        self.serverSocket = socket(AF_INET,SOCK_STREAM)
-        self.serverSocket.bind(('localhost',9999))
-        self.serverSocket.listen(5)
+        '''Constructor for the Server Class. Do not recive paramaters,
+           clients is an array for the clients connected to the server'''
+        self.clients = []
+        self.server_socket = socket(AF_INET, SOCK_STREAM)
+        self.server_socket.bind(('localhost', 9999))
+        self.server_socket.listen(5)
 
     def process_messages(self, con, add):
-        '''docstring'''
+        '''Process the message received from client socket adding user data.
+           If the client is disconnected removes the connection from the list'''
         while True:
             try:
                 data = con.recv(1024)
                 print data
                 msn = "User "+str(add[1])+":"+data
-                for client in self.clients:
-                    client.send(msn)
-            except:
+                self.send_msg_to_all(msn)
+            except Exception as exception:
                 self.clients.remove(con)
                 break
-            '''size = len(self.clients)
-            if size > 0:
-                for client in self.clients:
-                    try:
-                        data = client.recv(1024)
-                        if data != None:
-                            self.send_msg_to_all(data)
-                    except:
-                        self.clients.remove(client)'''
 
     def send_msg_to_all(self, data):
-        '''docstring'''
+        '''Send the message to all clients in the list ,
+           including the original sender'''
         for client in self.clients:
             client.send(data)
 
-    def create_threads(self,c,a):
-        '''docstring'''
-        clientThread = Thread(target=self.process_messages,args=(c,a))
-        clientThread.daemon = True
-        clientThread.start()
-
-    def connection_handler(self):
-        '''docstring'''
-        while True:
-            try:
-                con, add = self.serverSocket.accept()
-                self.clients.append(con)
-                print add
-                print self.clients
-            except:
-                pass
+    def create_threads(self, con, add):
+        '''Creates a thread in daemon mode to handle each connection from each client.
+           Receives a connection and adress from client socket'''
+        client_thread = Thread(target=self.process_messages, args=(con, add))
+        client_thread.daemon = True
+        client_thread.start()
 
     def run_server(self):
-        '''docstring'''
+        '''Run the main thread in the class. This is the method in charge
+           of handling new connections from the clients, creating a thread for each connection
+           and adding the new connection to the connections list'''
         while True:
-            con, add = self.serverSocket.accept()
-            self.create_threads(con,add)
-            self.clients.append(con)
-            print(add)
+            connection, address = self.server_socket.accept()
+            self.create_threads(connection, address)
+            self.clients.append(connection)
+            print "Clients connected"
+            print "=========================================================================>"
             print self.clients
 
-my_Server = Server()
-my_Server.run_server()
+#Instancing the class and running
+if __name__ == '__main__':
+    SERVER = Server()
+    SERVER.run_server()

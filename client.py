@@ -1,34 +1,23 @@
-from socket import *
-from threading import *
+from socket import socket, AF_INET, SOCK_STREAM
 from Tkinter import END
-import sys
+class Client(object):
+    """Class for Client, handles internally the messages and UI function"""
 
-class Client():
-    """docstring"""
+    def __init__(self, text_area, host='localhost', port=9999):
+        """Contructor for Client Class, defines socket connections and receives a
+           text area reference from the UI"""
+        self.client_socket = socket(AF_INET, SOCK_STREAM)
+        self.client_socket.connect((host, port))
+        self.area = text_area
 
-    def __init__(self,textA,host='localhost',port=9999):
-        """docstring"""
-        self.clientSocket = socket(AF_INET,SOCK_STREAM)
-        self.clientSocket.connect((host,port))
-        self.area = textA
-
-    '''def run_client(self):
-        msg_rev = Thread(target=self.message_received)
-        msg_rev.daemon = True
-        msg_rev.start()
-
-        while True:
-            msg = raw_input("->")
-            self.send_message(msg)'''
-
-
-    def send_message(self,message):
-        """docstring"""
-        self.clientSocket.send(message)
+    def send_message(self, message):
+        """Send the message from the UI to the server via socket defined in constructor"""
+        self.client_socket.send(message)
 
     def message_received(self):
-        """docstring"""
+        """Handles the data received via socke and manipulates the area reference from UI
+            to show the text in the component"""
         while True:
-            data = self.clientSocket.recv(1024)
+            data = self.client_socket.recv(1024)
             if data:
-                self.area.insert(END,str(data))
+                self.area.insert(END, str(data))
