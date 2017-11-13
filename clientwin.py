@@ -1,3 +1,4 @@
+'''clientwin.py: Run to create the client user interface'''
 from Tkinter import (Tk, StringVar, Entry, Button, Frame, Text, Scrollbar,
                      BOTTOM, LEFT, RIGHT, TOP, RIDGE, Y)
 from threading import Thread
@@ -24,8 +25,11 @@ class ClientUI(object):
     def create_widgets(self, frame):
         """Creates all the visual components inside the window for the client UI"""
         self.entry_message = Entry(frame, width=50, textvariable=self.message)
-        self.send_button = Button(frame, text="Enviar", relief=RIDGE,
-                                  command=self.send_button_action)
+        self.send_button = Button(frame, text="Enviar", relief=RIDGE,)
+
+        #Hit Enter key in the message area or left click on "Enviar" to send message
+        self.send_button.bind("<Button-1>", self.send_button_action)
+        self.entry_message.bind("<Return>", self.send_button_action)
 
         self.send_button.pack(side=BOTTOM)
         self.entry_message.pack(side=BOTTOM)
@@ -33,8 +37,8 @@ class ClientUI(object):
         self.messages_area = Text(frame, height=26, width=50)
         vertical_scroll = Scrollbar(frame, command=self.messages_area.yview)
         self.messages_area.configure(yscrollcommand=vertical_scroll.set)
-        self.messages_area.pack(side=LEFT)
 
+        self.messages_area.pack(side=LEFT)
         vertical_scroll.pack(side=RIGHT, fill=Y)
 
     def create_msg_recv_thread(self):
@@ -45,7 +49,7 @@ class ClientUI(object):
         msg_rev.start()
 
 
-    def send_button_action(self):
+    def send_button_action(self, event):
         '''Uses the instance of the Client class , gets the text data from the component
            and calls for the function in the instance'''
         text = str(self.message.get())+"\n"

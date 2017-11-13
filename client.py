@@ -1,3 +1,4 @@
+'''client.py: Handles the internal function of the client UI'''
 from socket import socket, AF_INET, SOCK_STREAM
 from Tkinter import END
 class Client(object):
